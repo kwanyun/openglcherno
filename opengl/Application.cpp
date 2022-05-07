@@ -13,6 +13,10 @@
 #include "VertexArray.h"
 #include "Shader.h"
 #include "Texture.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 int main(void)
 {
     GLFWwindow* window;
@@ -43,10 +47,10 @@ int main(void)
 
     std::cout << glGetString(GL_VERSION) << std::endl;
     {
-        float positions[] = { -0.5f, -0.5f,0.0f,0.0f, //0
-                               0.5f, -0.5f,1.0f,0.0f, //1
-                               0.5f, 0.5f,1.0f,1.0f, //2
-                              -0.5f, 0.5f,0.0f,1.0f  //3
+        float positions[] = { 100.f, 100.f,0.0f,0.0f, //0
+                              300.f, 100.f,1.0f,0.0f, //1
+                              300.f, 300.f,1.0f,1.0f, //2
+                              100.f, 300.f,0.0f,1.0f  //3
         };
 
         unsigned int indices[] = {
@@ -54,6 +58,7 @@ int main(void)
             2,3,0
         };
 
+        //for 
         //GLCall(glEnable(GL_BLEND));
         //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
@@ -66,12 +71,21 @@ int main(void)
 
         IndexBuffer ib(indices, 6);
 
+        glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+        glm::mat4 view=  glm::translate(glm::mat4(1.0f),glm::vec3(-100, 0, 0));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(300, 100.0f, 0));
+
+        glm::vec4 vp(100.0f, 100.f, 0.0f, 1.0f);
+        glm::vec4 result = proj * vp;
+
+        glm::mat4 MVP = proj * view*model;
+
 
         Shader shader("Basic.shader");
         shader.Bind();
 
-        //shader.SetUniform4f("u_Color", 0.5f, 0.7f, 0.8f,1.0f);
-
+        shader.SetUniform4f("u_Color", 0.5f, 0.7f, 0.8f,1.0f);
+        shader.SetUniformMat4f("u_MVP", MVP);
         Texture texture("kwan.png");
         //if slot number not set, set to 0
         texture.Bind();
